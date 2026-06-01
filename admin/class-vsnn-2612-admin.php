@@ -61,14 +61,18 @@ class VSNN_2612_Admin {
             .vsnn-check-row input[type='checkbox']:checked::after { content: ''; position: absolute; left: 5px; top: 1px; width: 4px; height: 9px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); display: block!important; }
 
             /* --- MEDIA SORTING --- */
-            #vsnn-list { margin: 0 0 10px; }
-            .vsnn-media-row { background: #fff; border: 1px solid #ddd; padding: 10px; margin-bottom: 5px; display: flex; gap: 10px; align-items: center; }
+            #vsnn-list { margin: 0 0 10px; max-height: 560px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; padding: 8px; border: 1px solid #dcdcde; background: #f6f7f7; }
+            .vsnn-media-row { position: relative; background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 8px; margin: 0; display: flex; flex-direction: column; gap: 7px; }
             .vsnn-media-row.ui-sortable-helper { box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
-            .vsnn-drag { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #8c8f94; cursor: grab; flex-shrink: 0; }
+            .vsnn-card-top { position: relative; height: 116px; background: #111; border-radius: 4px; overflow: hidden; }
+            .vsnn-drag { position: absolute; top: 6px; left: 6px; z-index: 3; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #fff; background: rgba(0,0,0,0.55); border-radius: 4px; cursor: grab; flex-shrink: 0; }
             .vsnn-drag:active, .vsnn-media-row.ui-sortable-helper .vsnn-drag { cursor: grabbing; color: #2271b1; }
-            .vsnn-filter-thumb { width: 50px; height: 50px; object-fit: cover; cursor: pointer; border: 2px solid transparent; transition: border-color .2s, transform .2s; }
+            .vsnn-filter-thumb { width: 100%; height: 100%; object-fit: cover; cursor: pointer; border: 2px solid transparent; transition: border-color .2s, transform .2s; display: block; }
             .vsnn-filter-thumb:hover { border-color: #2271b1; transform: scale(1.04); }
-            .vsnn-sort-placeholder { min-height: 72px; margin-bottom: 5px; border: 1px dashed #2271b1; background: #f0f6fc; }
+            .vsnn-card-fields input { width: 100%; box-sizing: border-box; margin: 0 0 5px; }
+            .vsnn-card-fields input:last-child { margin-bottom: 0; }
+            .vsnn-media-row .vsnn-rm { position: absolute; top: 6px; right: 6px; z-index: 3; min-height: 24px; height: 24px; width: 24px; padding: 0; line-height: 20px; background: rgba(255,255,255,0.92); }
+            .vsnn-sort-placeholder { min-height: 190px; border: 1px dashed #2271b1; background: #f0f6fc; border-radius: 6px; }
             #vsnn-filter-modal { display: none; position: fixed; inset: 0; z-index: 999999; align-items: center; justify-content: center; }
             .vsnn-filter-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.72); backdrop-filter: blur(2px); }
             .vsnn-filter-dialog { position: relative; z-index: 1; width: min(1120px, 94vw); max-height: 90vh; background: #fff; border-radius: 8px; box-shadow: 0 16px 40px rgba(0,0,0,0.35); display: flex; flex-direction: column; overflow: hidden; }
@@ -583,12 +587,14 @@ class VSNN_2612_Admin {
         $filter_labels = $this->get_filter_labels();
         $filter_label = $filter_labels[ $filter ] ?? 'No Filter';
         echo '<li class="vsnn-media-row">
-            <span class="dashicons dashicons-move vsnn-drag" title="Drag to reorder"></span>
-            <div><img src="'.esc_url($p).'" class="vsnn-filter-thumb" style="filter:'.esc_attr($filter_css).';" title="'.esc_attr($filter_label).'"></div>
-            <div style="flex:1"><input type="hidden" name="vsnn_i[id][]" class="i" value="'.esc_attr($d['id']).'"><input type="hidden" name="vsnn_i[url][]" class="u" value="'.esc_url($d['url']).'"><input type="hidden" name="vsnn_i[filter][]" class="f" value="'.esc_attr($filter).'">
-            <input type="text" name="vsnn_i[cap][]" value="'.esc_attr($d['caption']).'" placeholder="Caption" style="width:100%;margin-bottom:5px">
-            <input type="text" name="vsnn_i[vid][]" value="'.esc_attr($d['video']).'" placeholder="Video URL" style="width:100%"></div>
-            <button type="button" class="button vsnn-rm" style="color:red;border-color:red">&times;</button>
+            <div class="vsnn-card-top">
+                <span class="dashicons dashicons-move vsnn-drag" title="Drag to reorder"></span>
+                <img src="'.esc_url($p).'" class="vsnn-filter-thumb" style="filter:'.esc_attr($filter_css).';" title="'.esc_attr($filter_label).'">
+                <button type="button" class="button vsnn-rm" style="color:red;border-color:red">&times;</button>
+            </div>
+            <div class="vsnn-card-fields"><input type="hidden" name="vsnn_i[id][]" class="i" value="'.esc_attr($d['id']).'"><input type="hidden" name="vsnn_i[url][]" class="u" value="'.esc_url($d['url']).'"><input type="hidden" name="vsnn_i[filter][]" class="f" value="'.esc_attr($filter).'">
+            <input type="text" name="vsnn_i[cap][]" value="'.esc_attr($d['caption']).'" placeholder="Caption">
+            <input type="text" name="vsnn_i[vid][]" value="'.esc_attr($d['video']).'" placeholder="Video URL"></div>
         </li>';
     }
 
