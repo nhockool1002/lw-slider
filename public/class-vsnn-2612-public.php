@@ -85,6 +85,10 @@ class VSNN_2612_Public {
                 width: 100%; height: 100%; object-fit: cover; 
                 position: relative; z-index: 1; 
             }
+            .vsnn-public-item.is-portrait { background: #111; }
+            .vsnn-public-item.is-portrait img {
+                width: auto; max-width: 100%; height: 100%; object-fit: contain;
+            }
 
             /* --- LAYOUT MODES --- */
             /* Bottom */
@@ -186,8 +190,8 @@ class VSNN_2612_Public {
             <div class="vsnn-public-main <?php echo esc_attr($arrow_cls); ?>">
                 
                 <div class="vsnn-public-inner">
-                    <?php foreach($items as $k => $v): $act=$k==0?'active':''; ?>
-                    <div class="vsnn-public-item <?php echo $act; ?>">
+                    <?php foreach($items as $k => $v): $act=trim(($k==0?'active ':'') . ($this->is_portrait_item($v)?'is-portrait':'')); ?>
+                    <div class="vsnn-public-item <?php echo esc_attr($act); ?>">
                         <?php echo wp_get_attachment_image($v['id'], 'full', false, ['loading'=>($s['lazyload']=='on'&&$k>0?'lazy':'eager')]); ?>
                         
                         <?php if($ov_style) echo '<div class="vsnn-public-overlay" style="'.$ov_style.'"></div>'; ?>
@@ -308,6 +312,22 @@ class VSNN_2612_Public {
         </script>
         <?php
         return ob_get_clean();
+    }
+
+    private function is_portrait_item( $item ) {
+        $attachment_id = ! empty( $item['id'] ) ? absint( $item['id'] ) : 0;
+
+        if ( ! $attachment_id ) {
+            return false;
+        }
+
+        $meta = wp_get_attachment_metadata( $attachment_id );
+
+        if ( empty( $meta['width'] ) || empty( $meta['height'] ) ) {
+            return false;
+        }
+
+        return (int) $meta['height'] > (int) $meta['width'];
     }
 }
 ?>

@@ -60,6 +60,14 @@ class VSNN_2612_Admin {
             .vsnn-check-row input[type='checkbox']:checked { background-color: #00a32a!important; border-color: #00a32a!important; }
             .vsnn-check-row input[type='checkbox']:checked::after { content: ''; position: absolute; left: 5px; top: 1px; width: 4px; height: 9px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); display: block!important; }
 
+            /* --- MEDIA SORTING --- */
+            #vsnn-list { margin: 0 0 10px; }
+            .vsnn-media-row { background: #fff; border: 1px solid #ddd; padding: 10px; margin-bottom: 5px; display: flex; gap: 10px; align-items: center; }
+            .vsnn-media-row.ui-sortable-helper { box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+            .vsnn-drag { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #8c8f94; cursor: grab; flex-shrink: 0; }
+            .vsnn-drag:active, .vsnn-media-row.ui-sortable-helper .vsnn-drag { cursor: grabbing; color: #2271b1; }
+            .vsnn-sort-placeholder { min-height: 72px; margin-bottom: 5px; border: 1px dashed #2271b1; background: #f0f6fc; }
+
             /* --- PREVIEW BOX --- */
             .vsnn-preview-wrapper { position: relative; width: 100%; max-width: 700px; margin: 0 auto; background: #222; border: 1px solid #ccc; overflow: hidden; display: flex; }
             .vsnn-prev-main { position: relative; flex: 1; height: 400px; overflow: hidden; }
@@ -68,6 +76,8 @@ class VSNN_2612_Admin {
             .vsnn-preview-item { position: absolute; top:0; left:0; width:100%; height:100%; display: none; align-items: center; justify-content: center; z-index: 1; transition: opacity 0.5s ease; }
             .vsnn-preview-item.active { display: flex; opacity: 1; z-index: 5; }
             .vsnn-preview-item img { width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 1; }
+            .vsnn-preview-item.is-portrait { background: #111; }
+            .vsnn-preview-item.is-portrait img { width: auto; max-width: 100%; height: 100%; object-fit: contain; }
             
             /* --- TRANSITION EFFECTS --- */
             .vsnn-preview-wrapper[class*='effect-']:not(.effect-slide) .vsnn-preview-item { display: flex !important; opacity: 0; visibility: hidden; pointer-events: none; transition: transform 0.6s ease, opacity 0.6s ease, filter 0.6s ease; }
@@ -412,7 +422,13 @@ class VSNN_2612_Admin {
         <div id="vsnn-tmpl" style="display:none;"><?php $this->render_item_row(['id'=>'','url'=>'','caption'=>'','video'=>'']); ?></div>
         <script>
         jQuery(function($){
-            $('#vsnn-list').sortable();
+            $('#vsnn-list').sortable({
+                cursor: 'grabbing',
+                forcePlaceholderSize: true,
+                handle: '.vsnn-drag',
+                placeholder: 'vsnn-sort-placeholder',
+                tolerance: 'pointer'
+            });
             var f;
             $('#vsnn-add').click(function(e){
                 e.preventDefault(); if(f){f.open();return;}
@@ -432,13 +448,30 @@ class VSNN_2612_Admin {
 
     private function render_item_row($d){
         $p = $d['url']?:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCI+PHJlY3QgZmlsbD0iI2VlZSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIvPjwvc3ZnPg==';
-        echo '<li style="background:#fff;border:1px solid #ddd;padding:10px;margin-bottom:5px;display:flex;gap:10px;align-items:center;">
+        echo '<li class="vsnn-media-row">
+            <span class="dashicons dashicons-move vsnn-drag" title="Drag to reorder"></span>
             <img src="'.$p.'" style="width:50px;height:50px;object-fit:cover;">
             <div style="flex:1"><input type="hidden" name="vsnn_i[id][]" class="i" value="'.$d['id'].'"><input type="hidden" name="vsnn_i[url][]" class="u" value="'.$d['url'].'">
             <input type="text" name="vsnn_i[cap][]" value="'.$d['caption'].'" placeholder="Caption" style="width:100%;margin-bottom:5px">
             <input type="text" name="vsnn_i[vid][]" value="'.$d['video'].'" placeholder="Video URL" style="width:100%"></div>
             <button type="button" class="button vsnn-rm" style="color:red;border-color:red">&times;</button>
         </li>';
+    }
+
+    private function is_portrait_item( $item ) {
+        $attachment_id = ! empty( $item['id'] ) ? absint( $item['id'] ) : 0;
+
+        if ( ! $attachment_id ) {
+            return false;
+        }
+
+        $meta = wp_get_attachment_metadata( $attachment_id );
+
+        if ( empty( $meta['width'] ) || empty( $meta['height'] ) ) {
+            return false;
+        }
+
+        return (int) $meta['height'] > (int) $meta['width'];
     }
 
     public function render_preview_box($post) {
@@ -448,11 +481,11 @@ class VSNN_2612_Admin {
         <div class="vsnn-preview-wrapper" id="vsnn-prev-wrap">
             <div class="vsnn-prev-main">
                 <div class="vsnn-preview-inner" id="vsnn-prev-inner">
-                    <?php foreach($items as $k=>$v): $cls=$k==0?'active':''; ?>
-                    <div class="vsnn-preview-item <?php echo $cls; ?>">
-                        <img src="<?php echo $v['url']; ?>">
+                    <?php foreach($items as $k=>$v): $cls=trim(($k==0?'active ':'') . ($this->is_portrait_item($v)?'is-portrait':'')); ?>
+                    <div class="vsnn-preview-item <?php echo esc_attr($cls); ?>">
+                        <img src="<?php echo esc_url($v['url']); ?>">
                         <div class="vsnn-prev-overlay"></div>
-                        <div class="vsnn-preview-caption animate__animated"><?php echo $v['caption']; ?></div>
+                        <div class="vsnn-preview-caption animate__animated"><?php echo esc_html($v['caption']); ?></div>
                     </div>
                     <?php endforeach; ?>
                 </div>
