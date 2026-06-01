@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
                     </ul>
                 </li>
                 <li><strong>Overlay Color:</strong> Adds a layer over images to make text more readable (Dark 30%, 50%, or Gradient).</li>
-                <li><strong>Image Filter:</strong> Click an image in the Media section to open the filter modal. Each image can use its own preset, with 80 options focused on vintage film, chill colors, and landscape tones.</li>
+                <li><strong>Image Filter:</strong> Click an image in the Media section to open the filter modal. Each image can use its own preset, with 280 options focused on vintage film, chill colors, landscape tones, and natural greens.</li>
             </ul>
 
             <h3>3. Tips & Troubleshooting</h3>

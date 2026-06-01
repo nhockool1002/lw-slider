@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 class VSNN_2612_Filters {
 
     public static function get_presets() {
-        return array(
+        $presets = array(
             'Vintage Film' => array(
                 'vintage-film-01' => array( 'label' => 'Vintage Film 01 - Kodak Warm', 'css' => 'sepia(0.18) contrast(1.08) saturate(1.18) brightness(1.04)' ),
                 'vintage-film-02' => array( 'label' => 'Vintage Film 02 - Fuji Soft', 'css' => 'sepia(0.12) contrast(0.96) saturate(1.24) brightness(1.05) hue-rotate(-4deg)' ),
@@ -92,6 +92,86 @@ class VSNN_2612_Filters {
                 'landscape-25' => array( 'label' => 'Landscape 25 - Fresh Morning', 'css' => 'contrast(0.98) saturate(1.12) brightness(1.12) hue-rotate(6deg)' ),
             ),
         );
+
+        return array_merge( $presets, self::get_extended_presets() );
+    }
+
+    private static function get_extended_presets() {
+        return array(
+            'Vintage Film Extended' => self::build_vintage_extended_presets(),
+            'Landscape Color Extended' => self::build_landscape_extended_presets(),
+            'Nature Green Extended' => self::build_nature_green_extended_presets(),
+        );
+    }
+
+    private static function build_vintage_extended_presets() {
+        $names = array( 'Amber Roll', 'Expired Stock', 'Cinema Dust', 'Warm Memory', 'Old Negative', 'Retro Grain', 'Sepia Fade', 'Analog Cream', 'Soft Print', 'Copper Light' );
+        $presets = array();
+
+        for ( $i = 1; $i <= 70; $i++ ) {
+            $sepia      = self::css_decimal( 0.21 + ( ( $i * 7 ) % 49 ) / 100 );
+            $contrast   = self::css_decimal( 0.83 + ( ( $i * 5 ) % 44 ) / 100 );
+            $saturate   = self::css_decimal( 0.79 + ( ( $i * 11 ) % 84 ) / 100 );
+            $brightness = self::css_decimal( 0.93 + ( ( $i * 3 ) % 31 ) / 100 );
+            $hue        = -29 + ( ( $i * 13 ) % 59 );
+            $key        = sprintf( 'vintage-extended-%03d', $i );
+            $label      = sprintf( 'Vintage Extended %03d - %s', $i, $names[ ( $i - 1 ) % count( $names ) ] );
+
+            $presets[ $key ] = array(
+                'label' => $label,
+                'css'   => sprintf( 'sepia(%s) contrast(%s) saturate(%s) brightness(%s) hue-rotate(%ddeg)', $sepia, $contrast, $saturate, $brightness, $hue ),
+            );
+        }
+
+        return $presets;
+    }
+
+    private static function build_landscape_extended_presets() {
+        $names = array( 'Open Sky', 'Mountain Air', 'Desert Glow', 'Coastal Light', 'Golden Valley', 'Misty Road', 'Travel Clear', 'Dramatic Peak', 'Blue Horizon', 'Sunlit Field' );
+        $presets = array();
+
+        for ( $i = 1; $i <= 65; $i++ ) {
+            $sepia      = self::css_decimal( ( ( $i * 3 ) % 20 ) / 100 );
+            $contrast   = self::css_decimal( 0.97 + ( ( $i * 7 ) % 38 ) / 100 );
+            $saturate   = self::css_decimal( 1.02 + ( ( $i * 9 ) % 62 ) / 100 );
+            $brightness = self::css_decimal( 0.95 + ( ( $i * 5 ) % 30 ) / 100 );
+            $hue        = -18 + ( ( $i * 11 ) % 43 );
+            $key        = sprintf( 'landscape-extended-%03d', $i );
+            $label      = sprintf( 'Landscape Extended %03d - %s', $i, $names[ ( $i - 1 ) % count( $names ) ] );
+
+            $presets[ $key ] = array(
+                'label' => $label,
+                'css'   => sprintf( 'sepia(%s) contrast(%s) saturate(%s) brightness(%s) hue-rotate(%ddeg)', $sepia, $contrast, $saturate, $brightness, $hue ),
+            );
+        }
+
+        return $presets;
+    }
+
+    private static function build_nature_green_extended_presets() {
+        $names = array( 'Forest Calm', 'Moss Light', 'Jungle Fresh', 'Olive Shade', 'Tea Garden', 'Leaf Pop', 'Rainforest', 'Pine Mood', 'Emerald Air', 'Green Valley' );
+        $presets = array();
+
+        for ( $i = 1; $i <= 65; $i++ ) {
+            $sepia      = self::css_decimal( 0.03 + ( ( $i * 5 ) % 24 ) / 100 );
+            $contrast   = self::css_decimal( 0.90 + ( ( $i * 6 ) % 42 ) / 100 );
+            $saturate   = self::css_decimal( 0.98 + ( ( $i * 13 ) % 78 ) / 100 );
+            $brightness = self::css_decimal( 0.91 + ( ( $i * 4 ) % 33 ) / 100 );
+            $hue        = 8 + ( ( $i * 17 ) % 53 );
+            $key        = sprintf( 'nature-green-extended-%03d', $i );
+            $label      = sprintf( 'Nature Green Extended %03d - %s', $i, $names[ ( $i - 1 ) % count( $names ) ] );
+
+            $presets[ $key ] = array(
+                'label' => $label,
+                'css'   => sprintf( 'sepia(%s) contrast(%s) saturate(%s) brightness(%s) hue-rotate(%ddeg)', $sepia, $contrast, $saturate, $brightness, $hue ),
+            );
+        }
+
+        return $presets;
+    }
+
+    private static function css_decimal( $value ) {
+        return rtrim( rtrim( number_format( $value, 2, '.', '' ), '0' ), '.' );
     }
 
     public static function get_flat_presets() {
