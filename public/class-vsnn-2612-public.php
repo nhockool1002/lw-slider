@@ -192,7 +192,16 @@ class VSNN_2612_Public {
                 <div class="vsnn-public-inner">
                     <?php foreach($items as $k => $v): $act=trim(($k==0?'active ':'') . ($this->is_portrait_item($v)?'is-portrait':'')); ?>
                     <div class="vsnn-public-item <?php echo esc_attr($act); ?>">
-                        <?php echo wp_get_attachment_image($v['id'], 'full', false, ['loading'=>($s['lazyload']=='on'&&$k>0?'lazy':'eager')]); ?>
+                        <?php
+                        $image_attrs = array( 'loading' => ( $s['lazyload'] == 'on' && $k > 0 ? 'lazy' : 'eager' ) );
+                        $image_filter_css = VSNN_2612_Filters::get_css( $v['filter'] ?? 'none' );
+
+                        if ( 'none' !== $image_filter_css ) {
+                            $image_attrs['style'] = 'filter:' . esc_attr( $image_filter_css ) . ';';
+                        }
+
+                        echo wp_get_attachment_image( $v['id'], 'full', false, $image_attrs );
+                        ?>
                         
                         <?php if($ov_style) echo '<div class="vsnn-public-overlay" style="'.$ov_style.'"></div>'; ?>
                         
@@ -219,8 +228,9 @@ class VSNN_2612_Public {
                 <?php foreach($items as $k=>$v): 
                     $thumb_url = wp_get_attachment_image_url($v['id'], 'thumbnail') ?: $v['url']; 
                     $ac = $k==0 ? 'active' : '';
+                    $thumb_filter_css = VSNN_2612_Filters::get_css( $v['filter'] ?? 'none' );
                 ?>
-                <img src="<?php echo $thumb_url; ?>" class="<?php echo $ac; ?>" data-idx="<?php echo $k; ?>">
+                <img src="<?php echo esc_url($thumb_url); ?>" class="<?php echo esc_attr($ac); ?>" data-idx="<?php echo esc_attr($k); ?>" style="filter:<?php echo esc_attr($thumb_filter_css); ?>;">
                 <?php endforeach; ?>
             </div>
             <?php endif; ?>

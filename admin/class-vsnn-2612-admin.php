@@ -66,7 +66,27 @@ class VSNN_2612_Admin {
             .vsnn-media-row.ui-sortable-helper { box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
             .vsnn-drag { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #8c8f94; cursor: grab; flex-shrink: 0; }
             .vsnn-drag:active, .vsnn-media-row.ui-sortable-helper .vsnn-drag { cursor: grabbing; color: #2271b1; }
+            .vsnn-filter-thumb { width: 50px; height: 50px; object-fit: cover; cursor: pointer; border: 2px solid transparent; transition: border-color .2s, transform .2s; }
+            .vsnn-filter-thumb:hover { border-color: #2271b1; transform: scale(1.04); }
             .vsnn-sort-placeholder { min-height: 72px; margin-bottom: 5px; border: 1px dashed #2271b1; background: #f0f6fc; }
+            #vsnn-filter-modal { display: none; position: fixed; inset: 0; z-index: 999999; align-items: center; justify-content: center; }
+            .vsnn-filter-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.72); backdrop-filter: blur(2px); }
+            .vsnn-filter-dialog { position: relative; z-index: 1; width: min(1120px, 94vw); max-height: 90vh; background: #fff; border-radius: 8px; box-shadow: 0 16px 40px rgba(0,0,0,0.35); display: flex; flex-direction: column; overflow: hidden; }
+            .vsnn-filter-header, .vsnn-filter-footer { padding: 14px 18px; background: #f0f0f1; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+            .vsnn-filter-header h3 { margin: 0; font-size: 16px; }
+            .vsnn-filter-close { cursor: pointer; font-size: 24px; line-height: 1; color: #646970; }
+            .vsnn-filter-body { padding: 18px; overflow-y: auto; display: grid; grid-template-columns: minmax(320px, 40%) 1fr; gap: 18px; }
+            .vsnn-filter-preview { min-height: 440px; background: #111; display: flex; align-items: center; justify-content: center; border-radius: 6px; overflow: hidden; }
+            .vsnn-filter-preview img { max-width: 100%; max-height: 520px; object-fit: contain; }
+            .vsnn-filter-options { max-height: 560px; overflow-y: auto; padding-right: 4px; }
+            .vsnn-filter-group-title { margin: 12px 0 8px; font-size: 12px; color: #1d2327; text-transform: uppercase; letter-spacing: .04em; }
+            .vsnn-filter-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); gap: 10px; }
+            .vsnn-filter-card { padding: 6px; border: 2px solid #dcdcde; border-radius: 6px; background: #fff; cursor: pointer; text-align: left; transition: border-color .15s, box-shadow .15s, transform .15s; }
+            .vsnn-filter-card:hover, .vsnn-filter-card.is-selected { border-color: #2271b1; box-shadow: 0 0 0 1px #2271b1; }
+            .vsnn-filter-card.is-selected { background: #f0f6fc; }
+            .vsnn-filter-card img { width: 100%; height: 72px; object-fit: cover; display: block; border-radius: 4px; background: #111; }
+            .vsnn-filter-card span { display: block; margin-top: 5px; font-size: 11px; line-height: 1.25; color: #1d2327; }
+            @media (max-width: 782px) { .vsnn-filter-body { grid-template-columns: 1fr; } }
 
             /* --- PREVIEW BOX --- */
             .vsnn-preview-wrapper { position: relative; width: 100%; max-width: 700px; margin: 0 auto; background: #222; border: 1px solid #ccc; overflow: hidden; display: flex; }
@@ -268,7 +288,7 @@ class VSNN_2612_Admin {
                 if(ovVal=='dark50') bg='rgba(0,0,0,0.5)';
                 if(ovVal=='gradient') bg='linear-gradient(to top, rgba(0,0,0,0.9), transparent)';
                 ov.css('background', bg);
-                
+
                 // Thumbnails Visibility & Position
                 var showThumb = $('#vsnn_thumb_check').is(':checked');
                 var thumbPos = $('#vsnn_thumb_pos_select').val();
@@ -382,7 +402,6 @@ class VSNN_2612_Admin {
             $('#vsnn_effect, #vsnn_arrow, #vsnn_shadow, #vsnn_overlay, #vsnn_thumb_pos_select').on('change', function(e){
                 e.preventDefault(); e.stopPropagation();
             });
-            
             // Toggle Thumbnails Checkbox
             $('#vsnn_thumb_check').change(function(){
                 var disabled = !$(this).is(':checked');
@@ -413,15 +432,62 @@ class VSNN_2612_Admin {
 
     public function render_images_box( $post ) {
         $items = get_post_meta( $post->ID, '_vsnn_items', true );
+        $image_filter_presets = VSNN_2612_Filters::get_presets();
+        $image_filter_map = VSNN_2612_Filters::get_filter_map();
         wp_nonce_field( 'vsnn_save', 'vsnn_nonce' );
         ?>
         <div id="vsnn-wrapper">
             <ul id="vsnn-list" class="ui-sortable"><?php if(!empty($items)) foreach($items as $i) $this->render_item_row($i); ?></ul>
             <button class="button button-primary" id="vsnn-add">Add Media</button>
         </div>
-        <div id="vsnn-tmpl" style="display:none;"><?php $this->render_item_row(['id'=>'','url'=>'','caption'=>'','video'=>'']); ?></div>
+        <div id="vsnn-filter-modal">
+            <div class="vsnn-filter-backdrop"></div>
+            <div class="vsnn-filter-dialog">
+                <div class="vsnn-filter-header">
+                    <h3>Choose Image Filter</h3>
+                    <span class="vsnn-filter-close">&times;</span>
+                </div>
+                <div class="vsnn-filter-body">
+                    <div class="vsnn-filter-preview">
+                        <img src="" alt="">
+                    </div>
+                    <div class="vsnn-filter-options">
+                        <p class="description" style="margin-top:0;">Choose a filter card to preview it on the left, then click Apply Filter.</p>
+                        <div class="vsnn-filter-card-grid">
+                            <button type="button" class="vsnn-filter-card" data-filter-key="none" title="No Filter">
+                                <img src="" alt="" style="filter:none;">
+                                <span>No Filter</span>
+                            </button>
+                        </div>
+                        <?php foreach($image_filter_presets as $group_label => $presets): ?>
+                            <h4 class="vsnn-filter-group-title"><?php echo esc_html($group_label); ?></h4>
+                            <div class="vsnn-filter-card-grid">
+                                <?php foreach($presets as $filter_key => $preset): ?>
+                                    <button type="button" class="vsnn-filter-card" data-filter-key="<?php echo esc_attr($filter_key); ?>" title="<?php echo esc_attr($preset['label']); ?>">
+                                        <img src="" alt="" style="filter:<?php echo esc_attr($preset['css']); ?>;">
+                                        <span><?php echo esc_html($preset['label']); ?></span>
+                                    </button>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <div class="vsnn-filter-footer">
+                    <button type="button" class="button vsnn-filter-cancel">Cancel</button>
+                    <button type="button" class="button button-primary" id="vsnn-filter-apply">Apply Filter</button>
+                </div>
+            </div>
+        </div>
+        <div id="vsnn-tmpl" style="display:none;"><?php $this->render_item_row(['id'=>'','url'=>'','caption'=>'','video'=>'','filter'=>'none']); ?></div>
         <script>
         jQuery(function($){
+            var imageFilters = <?php echo wp_json_encode( $image_filter_map ); ?>;
+            var filterLabels = <?php echo wp_json_encode( $this->get_filter_labels() ); ?>;
+            var activeRow = null;
+            var selectedFilterKey = 'none';
+            var modal = $('#vsnn-filter-modal');
+            var modalImage = modal.find('.vsnn-filter-preview img');
+
             $('#vsnn-list').sortable({
                 cursor: 'grabbing',
                 forcePlaceholderSize: true,
@@ -429,6 +495,59 @@ class VSNN_2612_Admin {
                 placeholder: 'vsnn-sort-placeholder',
                 tolerance: 'pointer'
             });
+
+            function getFilterCss(filterKey) {
+                return imageFilters[filterKey] || 'none';
+            }
+
+            function getFilterLabel(filterKey) {
+                return filterLabels[filterKey] || 'No Filter';
+            }
+
+            function openFilterModal(row) {
+                activeRow = row;
+                var thumb = row.find('.vsnn-filter-thumb');
+                var filterKey = row.find('.f').val() || 'none';
+                selectedFilterKey = filterKey;
+
+                modalImage.attr('src', thumb.attr('src'));
+                modalImage.css('filter', getFilterCss(filterKey));
+                modal.find('.vsnn-filter-card img').attr('src', thumb.attr('src'));
+                modal.find('.vsnn-filter-card').removeClass('is-selected');
+                modal.find('.vsnn-filter-card[data-filter-key="' + filterKey + '"]').addClass('is-selected');
+                modal.css('display', 'flex');
+            }
+
+            function closeFilterModal() {
+                modal.hide();
+                activeRow = null;
+            }
+
+            $(document).on('click', '.vsnn-filter-card', function(e){
+                e.preventDefault();
+                selectedFilterKey = $(this).attr('data-filter-key') || 'none';
+                modal.find('.vsnn-filter-card').removeClass('is-selected');
+                $(this).addClass('is-selected');
+                modalImage.css('filter', getFilterCss(selectedFilterKey));
+            });
+
+            $(document).on('click', '.vsnn-filter-thumb', function(e){
+                e.preventDefault();
+                openFilterModal($(this).closest('.vsnn-media-row'));
+            });
+
+            $('.vsnn-filter-close, .vsnn-filter-backdrop, .vsnn-filter-cancel').on('click', closeFilterModal);
+
+            $('#vsnn-filter-apply').on('click', function(){
+                if(!activeRow) return;
+
+                var filterKey = selectedFilterKey || 'none';
+                activeRow.find('.f').val(filterKey);
+                activeRow.find('.vsnn-filter-thumb').css('filter', getFilterCss(filterKey));
+                activeRow.find('.vsnn-filter-thumb').attr('title', getFilterLabel(filterKey));
+                closeFilterModal();
+            });
+
             var f;
             $('#vsnn-add').click(function(e){
                 e.preventDefault(); if(f){f.open();return;}
@@ -436,6 +555,7 @@ class VSNN_2612_Admin {
                 f.on('select',function(){ f.state().get('selection').map(function(a){
                     a=a.toJSON(); var t=$($('#vsnn-tmpl').html());
                     t.find('img').attr('src',a.url); t.find('.u').val(a.url); t.find('.i').val(a.id);
+                    t.find('.f').val('none'); t.find('.vsnn-filter-thumb').css('filter','none').attr('title','No Filter');
                     $('#vsnn-list').append(t);
                 });});
                 f.open();
@@ -446,14 +566,28 @@ class VSNN_2612_Admin {
         <?php
     }
 
+    private function get_filter_labels() {
+        $labels = array( 'none' => 'No Filter' );
+
+        foreach ( VSNN_2612_Filters::get_flat_presets() as $filter_key => $preset ) {
+            $labels[ $filter_key ] = $preset['label'];
+        }
+
+        return $labels;
+    }
+
     private function render_item_row($d){
         $p = $d['url']?:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCI+PHJlY3QgZmlsbD0iI2VlZSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIvPjwvc3ZnPg==';
+        $filter = VSNN_2612_Filters::sanitize( $d['filter'] ?? 'none' );
+        $filter_css = VSNN_2612_Filters::get_css( $filter );
+        $filter_labels = $this->get_filter_labels();
+        $filter_label = $filter_labels[ $filter ] ?? 'No Filter';
         echo '<li class="vsnn-media-row">
             <span class="dashicons dashicons-move vsnn-drag" title="Drag to reorder"></span>
-            <img src="'.$p.'" style="width:50px;height:50px;object-fit:cover;">
-            <div style="flex:1"><input type="hidden" name="vsnn_i[id][]" class="i" value="'.$d['id'].'"><input type="hidden" name="vsnn_i[url][]" class="u" value="'.$d['url'].'">
-            <input type="text" name="vsnn_i[cap][]" value="'.$d['caption'].'" placeholder="Caption" style="width:100%;margin-bottom:5px">
-            <input type="text" name="vsnn_i[vid][]" value="'.$d['video'].'" placeholder="Video URL" style="width:100%"></div>
+            <div><img src="'.esc_url($p).'" class="vsnn-filter-thumb" style="filter:'.esc_attr($filter_css).';" title="'.esc_attr($filter_label).'"></div>
+            <div style="flex:1"><input type="hidden" name="vsnn_i[id][]" class="i" value="'.esc_attr($d['id']).'"><input type="hidden" name="vsnn_i[url][]" class="u" value="'.esc_url($d['url']).'"><input type="hidden" name="vsnn_i[filter][]" class="f" value="'.esc_attr($filter).'">
+            <input type="text" name="vsnn_i[cap][]" value="'.esc_attr($d['caption']).'" placeholder="Caption" style="width:100%;margin-bottom:5px">
+            <input type="text" name="vsnn_i[vid][]" value="'.esc_attr($d['video']).'" placeholder="Video URL" style="width:100%"></div>
             <button type="button" class="button vsnn-rm" style="color:red;border-color:red">&times;</button>
         </li>';
     }
@@ -481,9 +615,9 @@ class VSNN_2612_Admin {
         <div class="vsnn-preview-wrapper" id="vsnn-prev-wrap">
             <div class="vsnn-prev-main">
                 <div class="vsnn-preview-inner" id="vsnn-prev-inner">
-                    <?php foreach($items as $k=>$v): $cls=trim(($k==0?'active ':'') . ($this->is_portrait_item($v)?'is-portrait':'')); ?>
+                    <?php foreach($items as $k=>$v): $cls=trim(($k==0?'active ':'') . ($this->is_portrait_item($v)?'is-portrait':'')); $filter_css=VSNN_2612_Filters::get_css($v['filter'] ?? 'none'); ?>
                     <div class="vsnn-preview-item <?php echo esc_attr($cls); ?>">
-                        <img src="<?php echo esc_url($v['url']); ?>">
+                        <img src="<?php echo esc_url($v['url']); ?>" style="filter:<?php echo esc_attr($filter_css); ?>;">
                         <div class="vsnn-prev-overlay"></div>
                         <div class="vsnn-preview-caption animate__animated"><?php echo esc_html($v['caption']); ?></div>
                     </div>
@@ -494,8 +628,8 @@ class VSNN_2612_Admin {
             </div>
             
             <div class="vsnn-prev-thumbs" id="vsnn-prev-thumbs">
-                <?php foreach($items as $k=>$v): $ac=$k==0?'active':''; ?>
-                <img src="<?php echo $v['url']; ?>" class="<?php echo $ac; ?>">
+                <?php foreach($items as $k=>$v): $ac=$k==0?'active':''; $filter_css=VSNN_2612_Filters::get_css($v['filter'] ?? 'none'); ?>
+                <img src="<?php echo esc_url($v['url']); ?>" class="<?php echo esc_attr($ac); ?>" style="filter:<?php echo esc_attr($filter_css); ?>;">
                 <?php endforeach; ?>
             </div>
         </div>
@@ -510,7 +644,13 @@ class VSNN_2612_Admin {
             $d=[];
             $ii=$_POST['vsnn_i'];
             for($i=0;$i<count($ii['url']);$i++){
-                if($ii['url'][$i]) $d[]=['id'=>$ii['id'][$i], 'url'=>$ii['url'][$i], 'caption'=>sanitize_text_field($ii['cap'][$i]), 'video'=>esc_url_raw($ii['vid'][$i])];
+                if($ii['url'][$i]) $d[]=[
+                    'id'=>absint($ii['id'][$i]),
+                    'url'=>esc_url_raw($ii['url'][$i]),
+                    'caption'=>sanitize_text_field($ii['cap'][$i]),
+                    'video'=>esc_url_raw($ii['vid'][$i]),
+                    'filter'=>VSNN_2612_Filters::sanitize($ii['filter'][$i] ?? 'none')
+                ];
             }
             update_post_meta($post_id,'_vsnn_items',$d);
         }
