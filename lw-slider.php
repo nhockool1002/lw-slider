@@ -3,7 +3,7 @@
  * Plugin Name:       LWSlider - Lightweight BS5 Slider
  * Plugin URI:        https://codecanyon.net/user/nhutnguyen
  * Description:       A lightweight, fast, and highly customizable Bootstrap 5 slider. Supports Touch Swipe, Animate.css, Video, and unique 3D effects.
- * Version:           0.0.1h
+ * Version:           0.0.1k
  * Author:            Nhut Nguyen
  * Author URI:        mailto:nhut.nguyenminh.it@gmail.com
  * Text Domain:       lw-slider
@@ -17,7 +17,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 // 1. Define Constants (Prefix: VSNN_2612)
-define( 'VSNN_2612_VERSION', '0.0.1h' );
+define( 'VSNN_2612_VERSION', '0.0.1k' );
 define( 'VSNN_2612_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'VSNN_2612_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'VSNN_2612_TEXT_DOMAIN', 'lw-slider' );
@@ -212,6 +212,62 @@ function vsnn_2612_add_update_check_link( $links ) {
 }
 add_filter( 'plugin_action_links_' . VSNN_2612_PLUGIN_BASENAME, 'vsnn_2612_add_update_check_link' );
 
+function vsnn_2612_get_plugin_details_description() {
+    return wp_kses_post(
+        '<p><strong>LWSlider - Lightweight BS5 Slider</strong> là plugin tạo slider ảnh nhẹ, nhanh và linh hoạt cho WordPress. Plugin được thiết kế cho blog du lịch, website nội dung, landing page, portfolio, gallery ảnh và các trang cần trình bày hình ảnh đẹp mà không phụ thuộc vào page builder nặng.</p>
+
+        <p>Plugin cho phép tạo nhiều bộ slider riêng biệt thông qua post type <code>LWSlider</code>. Mỗi slider có shortcode riêng dạng <code>[lw_slider id="..."]</code>, có thể chèn vào bài viết, trang, widget hoặc trình soạn thảo Classic/Gutenberg. Người dùng có thể thêm nhiều ảnh từ Media Library, kéo thả để sắp xếp thứ tự hiển thị, nhập caption, gán video URL và cấu hình giao diện trực tiếp trong trang quản trị.</p>
+
+        <h3>Tính năng quản trị slider</h3>
+        <ul>
+            <li>Tạo và quản lý slider bằng giao diện riêng trong WordPress Admin.</li>
+            <li>Thêm nhiều hình ảnh cùng lúc từ WordPress Media Library.</li>
+            <li>Hiển thị danh sách media dạng card compact, tiết kiệm diện tích và có vùng scroll riêng khi có nhiều ảnh.</li>
+            <li>Kéo thả để thay đổi thứ tự hình ảnh trong slider.</li>
+            <li>Nhập caption riêng cho từng ảnh.</li>
+            <li>Hỗ trợ lưu video URL cho từng media item để mở rộng về sau.</li>
+            <li>Click vào thumbnail để mở modal chọn filter màu riêng cho từng ảnh.</li>
+            <li>Tooltip thumbnail hiển thị tên filter đang được áp dụng khi hover.</li>
+            <li>Preview trực tiếp trong admin để kiểm tra bố cục, caption, thumbnail, hiệu ứng và filter.</li>
+        </ul>
+
+        <h3>Bộ lọc màu và chỉnh màu ảnh</h3>
+        <p>LWSlider đi kèm hệ thống filter lớn, được chia theo cụm có thể collapse/expand để dễ duyệt. Mỗi ảnh trong cùng một slider có thể dùng một filter khác nhau. Filter được preview ngay trong modal trước khi áp dụng.</p>
+        <ul>
+            <li>Hơn 700 preset filter màu.</li>
+            <li>Các nhóm màu vintage film, chill tone, landscape color, nature green, dark & moody, cinematic teal & orange, Japanese anime/pastel blue và Nordic/faded winter.</li>
+            <li>Các nhóm filter lấy cảm hứng từ Intervention Image, Instagraph-style và Grafika.</li>
+            <li>Card preview nhỏ gọn giúp xem được nhiều filter hơn trong cùng một màn hình.</li>
+            <li>Đảm bảo key, label và công thức CSS filter không trùng nhau.</li>
+        </ul>
+
+        <h3>Tính năng hiển thị frontend</h3>
+        <ul>
+            <li>Render slider bằng shortcode đơn giản.</li>
+            <li>Hỗ trợ nhiều hiệu ứng chuyển slide: Slide, Fade, Vertical, Zoom, Flip và Blur.</li>
+            <li>Hỗ trợ hiệu ứng caption thông qua Animate.css.</li>
+            <li>Tuỳ chỉnh kiểu mũi tên điều hướng: Default, Box, Circle và Dark.</li>
+            <li>Tuỳ chỉnh vị trí thumbnail: Bottom, Left hoặc Right.</li>
+            <li>Thumbnail ở vị trí Bottom có thể scroll ngang khi số lượng ảnh lớn.</li>
+            <li>Thumbnail ở vị trí Left/Right có thể scroll dọc.</li>
+            <li>Hỗ trợ autoplay, interval tuỳ chỉnh, random order và lazy load.</li>
+            <li>Hỗ trợ overlay màu tối, overlay gradient, bo góc và shadow cho khung slider.</li>
+            <li>Ảnh portrait được nhận diện và hiển thị theo dạng contain để không bị cắt mất nội dung.</li>
+        </ul>
+
+        <h3>Hiệu năng và khả năng mở rộng</h3>
+        <ul>
+            <li>Không yêu cầu build tool phức tạp.</li>
+            <li>Dùng shortcode và WordPress metadata nên dễ backup, migrate và tích hợp vào theme hiện có.</li>
+            <li>Nạp Animate.css khi cần cho hiệu ứng caption.</li>
+            <li>Tích hợp Composer autoload để sẵn sàng mở rộng xử lý ảnh với các thư viện PHP.</li>
+            <li>Có cơ chế auto update qua GitHub Releases, kèm nút kiểm tra cập nhật thủ công trong danh sách plugin.</li>
+        </ul>
+
+        <p>LWSlider phù hợp khi bạn cần một slider nhẹ nhưng vẫn có khả năng tuỳ chỉnh sâu: quản lý nhiều slider, chỉnh từng ảnh, áp dụng filter riêng, preview trực quan trong admin và hiển thị frontend đẹp trên cả desktop lẫn mobile.</p>'
+    );
+}
+
 function vsnn_2612_github_plugin_info( $result, $action, $args ) {
     if ( 'plugin_information' !== $action || empty( $args->slug ) || VSNN_2612_SLUG !== $args->slug ) {
         return $result;
@@ -233,7 +289,7 @@ function vsnn_2612_github_plugin_info( $result, $action, $args ) {
         'homepage'      => VSNN_2612_GITHUB_URL,
         'download_link' => $release['package'],
         'sections'      => array(
-            'description' => 'A lightweight, fast, and highly customizable Bootstrap 5 slider.',
+            'description' => vsnn_2612_get_plugin_details_description(),
             'changelog'   => $description,
         ),
     );
