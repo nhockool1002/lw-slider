@@ -101,6 +101,13 @@ class VSNN_2612_Filters {
             'Vintage Film Extended' => self::build_vintage_extended_presets(),
             'Landscape Color Extended' => self::build_landscape_extended_presets(),
             'Nature Green Extended' => self::build_nature_green_extended_presets(),
+            'Dark & Moody' => self::build_dark_moody_presets(),
+            'Cinematic Teal & Orange' => self::build_cinematic_teal_orange_presets(),
+            'Japanese Anime / Pastel Blue' => self::build_japanese_anime_pastel_blue_presets(),
+            'Nordic / Faded Winter' => self::build_nordic_faded_winter_presets(),
+            'Intervention Image Inspired' => self::build_intervention_image_presets(),
+            'Instagraph Style' => self::build_instagraph_style_presets(),
+            'Grafika Inspired' => self::build_grafika_presets(),
         );
     }
 
@@ -164,6 +171,163 @@ class VSNN_2612_Filters {
             $presets[ $key ] = array(
                 'label' => $label,
                 'css'   => sprintf( 'sepia(%s) contrast(%s) saturate(%s) brightness(%s) hue-rotate(%ddeg)', $sepia, $contrast, $saturate, $brightness, $hue ),
+            );
+        }
+
+        return $presets;
+    }
+
+    private static function build_dark_moody_presets() {
+        $names = array( 'Midnight Rain', 'Charcoal Street', 'Deep Shadow', 'Storm Glass', 'Noir Forest', 'Low Light', 'Ash Blue', 'Velvet Night', 'Cold Alley', 'Muted Smoke' );
+        $presets = array();
+
+        for ( $i = 1; $i <= 50; $i++ ) {
+            $grayscale  = self::css_decimal( 0.04 + ( ( $i * 7 ) % 30 ) / 100 );
+            $sepia      = self::css_decimal( 0.02 + ( ( $i * 5 ) % 18 ) / 100 );
+            $contrast   = self::css_decimal( 1.12 + ( ( $i * 9 ) % 48 ) / 100 );
+            $saturate   = self::css_decimal( 0.46 + ( ( $i * 11 ) % 45 ) / 100 );
+            $brightness = self::css_decimal( 0.62 + ( ( $i * 4 ) % 28 ) / 100 );
+            $hue        = -25 + ( ( $i * 13 ) % 36 );
+            $key        = sprintf( 'dark-moody-%03d', $i );
+            $label      = sprintf( 'Dark & Moody %03d - %s', $i, $names[ ( $i - 1 ) % count( $names ) ] );
+
+            $presets[ $key ] = array(
+                'label' => $label,
+                'css'   => sprintf( 'grayscale(%s) sepia(%s) contrast(%s) saturate(%s) brightness(%s) hue-rotate(%ddeg)', $grayscale, $sepia, $contrast, $saturate, $brightness, $hue ),
+            );
+        }
+
+        return $presets;
+    }
+
+    private static function build_cinematic_teal_orange_presets() {
+        $names = array( 'Blockbuster Teal', 'Amber Skin', 'Urban Cinema', 'Desert Teal', 'Night Drive', 'Warm Highlight', 'Deep Cyan', 'Orange Glow', 'Action Grade', 'Dusk Frame' );
+        $presets = array();
+
+        for ( $i = 1; $i <= 50; $i++ ) {
+            $sepia      = self::css_decimal( 0.07 + ( ( $i * 3 ) % 24 ) / 100 );
+            $contrast   = self::css_decimal( 1.03 + ( ( $i * 8 ) % 46 ) / 100 );
+            $saturate   = self::css_decimal( 1.12 + ( ( $i * 10 ) % 70 ) / 100 );
+            $brightness = self::css_decimal( 0.88 + ( ( $i * 5 ) % 32 ) / 100 );
+            $hue        = -18 + ( ( $i * 17 ) % 47 );
+            $key        = sprintf( 'cinematic-teal-orange-%03d', $i );
+            $label      = sprintf( 'Cinematic Teal & Orange %03d - %s', $i, $names[ ( $i - 1 ) % count( $names ) ] );
+
+            $presets[ $key ] = array(
+                'label' => $label,
+                'css'   => sprintf( 'sepia(%s) contrast(%s) saturate(%s) brightness(%s) hue-rotate(%ddeg)', $sepia, $contrast, $saturate, $brightness, $hue ),
+            );
+        }
+
+        return $presets;
+    }
+
+    private static function build_japanese_anime_pastel_blue_presets() {
+        $names = array( 'Sky Classroom', 'Pastel Harbor', 'Soft Sakura', 'Blue Morning', 'Dream Cloud', 'Seaside Anime', 'Light Novel', 'Summer Train', 'Clear Cyan', 'Gentle Azure' );
+        $presets = array();
+
+        for ( $i = 1; $i <= 100; $i++ ) {
+            $sepia      = self::css_decimal( ( ( $i * 2 ) % 12 ) / 100 );
+            $contrast   = self::css_decimal( 0.76 + ( ( $i * 5 ) % 36 ) / 100 );
+            $saturate   = self::css_decimal( 1.05 + ( ( $i * 7 ) % 82 ) / 100 );
+            $brightness = self::css_decimal( 1.04 + ( ( $i * 3 ) % 38 ) / 100 );
+            $hue        = 11 + ( ( $i * 19 ) % 63 );
+            $key        = sprintf( 'japanese-anime-pastel-blue-%03d', $i );
+            $label      = sprintf( 'Japanese Anime / Pastel Blue %03d - %s', $i, $names[ ( $i - 1 ) % count( $names ) ] );
+
+            $presets[ $key ] = array(
+                'label' => $label,
+                'css'   => sprintf( 'sepia(%s) contrast(%s) saturate(%s) brightness(%s) hue-rotate(%ddeg)', $sepia, $contrast, $saturate, $brightness, $hue ),
+            );
+        }
+
+        return $presets;
+    }
+
+    private static function build_nordic_faded_winter_presets() {
+        $names = array( 'Snow Field', 'Frost Glass', 'Pale Fjord', 'Muted Pine', 'Winter Fog', 'Icy Morning', 'Cold Linen', 'Faded North', 'Arctic Calm', 'Grey Lake' );
+        $presets = array();
+
+        for ( $i = 1; $i <= 100; $i++ ) {
+            $grayscale  = self::css_decimal( 0.08 + ( ( $i * 6 ) % 42 ) / 100 );
+            $sepia      = self::css_decimal( ( ( $i * 3 ) % 16 ) / 100 );
+            $contrast   = self::css_decimal( 0.72 + ( ( $i * 4 ) % 38 ) / 100 );
+            $saturate   = self::css_decimal( 0.42 + ( ( $i * 9 ) % 52 ) / 100 );
+            $brightness = self::css_decimal( 1.0 + ( ( $i * 5 ) % 36 ) / 100 );
+            $hue        = 6 + ( ( $i * 11 ) % 45 );
+            $key        = sprintf( 'nordic-faded-winter-%03d', $i );
+            $label      = sprintf( 'Nordic / Faded Winter %03d - %s', $i, $names[ ( $i - 1 ) % count( $names ) ] );
+
+            $presets[ $key ] = array(
+                'label' => $label,
+                'css'   => sprintf( 'grayscale(%s) sepia(%s) contrast(%s) saturate(%s) brightness(%s) hue-rotate(%ddeg)', $grayscale, $sepia, $contrast, $saturate, $brightness, $hue ),
+            );
+        }
+
+        return $presets;
+    }
+
+    private static function build_intervention_image_presets() {
+        $names = array( 'Sharpen Warm', 'Color Balance', 'Soft Contrast', 'High Clarity', 'Studio Matte', 'Adaptive Glow', 'Warm Resize', 'Clean Boost', 'Tonal Curve', 'Soft Enhance' );
+        $presets = array();
+
+        for ( $i = 1; $i <= 50; $i++ ) {
+            $sepia      = self::css_decimal( 0.04 + ( ( $i * 4 ) % 28 ) / 100 );
+            $contrast   = self::css_decimal( 0.92 + ( ( $i * 9 ) % 58 ) / 100 );
+            $saturate   = self::css_decimal( 0.88 + ( ( $i * 12 ) % 90 ) / 100 );
+            $brightness = self::css_decimal( 0.88 + ( ( $i * 7 ) % 44 ) / 100 );
+            $hue        = -21 + ( ( $i * 19 ) % 57 );
+            $key        = sprintf( 'intervention-image-%03d', $i );
+            $label      = sprintf( 'Intervention Image %03d - %s', $i, $names[ ( $i - 1 ) % count( $names ) ] );
+
+            $presets[ $key ] = array(
+                'label' => $label,
+                'css'   => sprintf( 'sepia(%s) contrast(%s) saturate(%s) brightness(%s) hue-rotate(%ddeg)', $sepia, $contrast, $saturate, $brightness, $hue ),
+            );
+        }
+
+        return $presets;
+    }
+
+    private static function build_instagraph_style_presets() {
+        $names = array( 'Valencia Mood', 'Amaro Soft', 'Lo-Fi Pop', 'Nashville Cream', 'Toaster Warm', 'Hudson Blue', 'Rise Glow', 'X-Pro Punch', 'Sutro Shade', 'Earlybird Fade' );
+        $presets = array();
+
+        for ( $i = 1; $i <= 50; $i++ ) {
+            $sepia      = self::css_decimal( 0.08 + ( ( $i * 8 ) % 42 ) / 100 );
+            $contrast   = self::css_decimal( 0.82 + ( ( $i * 11 ) % 66 ) / 100 );
+            $saturate   = self::css_decimal( 0.84 + ( ( $i * 15 ) % 112 ) / 100 );
+            $brightness = self::css_decimal( 0.9 + ( ( $i * 6 ) % 44 ) / 100 );
+            $hue        = -32 + ( ( $i * 23 ) % 73 );
+            $key        = sprintf( 'instagraph-style-%03d', $i );
+            $label      = sprintf( 'Instagraph Style %03d - %s', $i, $names[ ( $i - 1 ) % count( $names ) ] );
+
+            $presets[ $key ] = array(
+                'label' => $label,
+                'css'   => sprintf( 'sepia(%s) contrast(%s) saturate(%s) brightness(%s) hue-rotate(%ddeg)', $sepia, $contrast, $saturate, $brightness, $hue ),
+            );
+        }
+
+        return $presets;
+    }
+
+    private static function build_grafika_presets() {
+        $names = array( 'Smart Crop Tone', 'Color Mix', 'Soft Resize', 'Edge Balance', 'Vibrant Matte', 'Pixel Clean', 'Natural Boost', 'Sharp Fade', 'Photo Lab', 'Balanced Light' );
+        $presets = array();
+
+        for ( $i = 1; $i <= 50; $i++ ) {
+            $grayscale  = self::css_decimal( ( ( $i * 5 ) % 22 ) / 100 );
+            $sepia      = self::css_decimal( 0.03 + ( ( $i * 6 ) % 34 ) / 100 );
+            $contrast   = self::css_decimal( 0.86 + ( ( $i * 13 ) % 64 ) / 100 );
+            $saturate   = self::css_decimal( 0.76 + ( ( $i * 17 ) % 104 ) / 100 );
+            $brightness = self::css_decimal( 0.87 + ( ( $i * 8 ) % 46 ) / 100 );
+            $hue        = -16 + ( ( $i * 29 ) % 67 );
+            $key        = sprintf( 'grafika-inspired-%03d', $i );
+            $label      = sprintf( 'Grafika %03d - %s', $i, $names[ ( $i - 1 ) % count( $names ) ] );
+
+            $presets[ $key ] = array(
+                'label' => $label,
+                'css'   => sprintf( 'grayscale(%s) sepia(%s) contrast(%s) saturate(%s) brightness(%s) hue-rotate(%ddeg)', $grayscale, $sepia, $contrast, $saturate, $brightness, $hue ),
             );
         }
 

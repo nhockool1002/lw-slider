@@ -83,13 +83,16 @@ class VSNN_2612_Admin {
             .vsnn-filter-preview { min-height: 440px; background: #111; display: flex; align-items: center; justify-content: center; border-radius: 6px; overflow: hidden; }
             .vsnn-filter-preview img { max-width: 100%; max-height: 520px; object-fit: contain; }
             .vsnn-filter-options { max-height: 560px; overflow-y: auto; padding-right: 4px; }
-            .vsnn-filter-group-title { margin: 12px 0 8px; font-size: 12px; color: #1d2327; text-transform: uppercase; letter-spacing: .04em; }
-            .vsnn-filter-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); gap: 10px; }
-            .vsnn-filter-card { padding: 6px; border: 2px solid #dcdcde; border-radius: 6px; background: #fff; cursor: pointer; text-align: left; transition: border-color .15s, box-shadow .15s, transform .15s; }
+            .vsnn-filter-group { border: 1px solid #dcdcde; border-radius: 6px; margin-bottom: 8px; background: #fff; overflow: hidden; }
+            .vsnn-filter-group summary { padding: 9px 10px; cursor: pointer; font-weight: 600; color: #1d2327; background: #f6f7f7; user-select: none; }
+            .vsnn-filter-group[open] summary { border-bottom: 1px solid #dcdcde; background: #f0f6fc; color: #2271b1; }
+            .vsnn-filter-count { color: #646970; font-weight: 400; margin-left: 4px; }
+            .vsnn-filter-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 7px; padding: 8px; }
+            .vsnn-filter-card { padding: 4px; border: 2px solid #dcdcde; border-radius: 6px; background: #fff; cursor: pointer; text-align: left; transition: border-color .15s, box-shadow .15s, transform .15s; }
             .vsnn-filter-card:hover, .vsnn-filter-card.is-selected { border-color: #2271b1; box-shadow: 0 0 0 1px #2271b1; }
             .vsnn-filter-card.is-selected { background: #f0f6fc; }
-            .vsnn-filter-card img { width: 100%; height: 72px; object-fit: cover; display: block; border-radius: 4px; background: #111; }
-            .vsnn-filter-card span { display: block; margin-top: 5px; font-size: 11px; line-height: 1.25; color: #1d2327; }
+            .vsnn-filter-card img { width: 100%; height: 48px; object-fit: cover; display: block; border-radius: 4px; background: #111; }
+            .vsnn-filter-card span { display: block; margin-top: 4px; font-size: 10px; line-height: 1.2; color: #1d2327; }
             @media (max-width: 782px) { .vsnn-filter-body { grid-template-columns: 1fr; } }
 
             /* --- PREVIEW BOX --- */
@@ -464,15 +467,17 @@ class VSNN_2612_Admin {
                             </button>
                         </div>
                         <?php foreach($image_filter_presets as $group_label => $presets): ?>
-                            <h4 class="vsnn-filter-group-title"><?php echo esc_html($group_label); ?></h4>
-                            <div class="vsnn-filter-card-grid">
-                                <?php foreach($presets as $filter_key => $preset): ?>
-                                    <button type="button" class="vsnn-filter-card" data-filter-key="<?php echo esc_attr($filter_key); ?>" title="<?php echo esc_attr($preset['label']); ?>">
-                                        <img src="" alt="" style="filter:<?php echo esc_attr($preset['css']); ?>;">
-                                        <span><?php echo esc_html($preset['label']); ?></span>
-                                    </button>
-                                <?php endforeach; ?>
-                            </div>
+                            <details class="vsnn-filter-group">
+                                <summary><?php echo esc_html($group_label); ?> <span class="vsnn-filter-count">(<?php echo esc_html(count($presets)); ?>)</span></summary>
+                                <div class="vsnn-filter-card-grid">
+                                    <?php foreach($presets as $filter_key => $preset): ?>
+                                        <button type="button" class="vsnn-filter-card" data-filter-key="<?php echo esc_attr($filter_key); ?>" title="<?php echo esc_attr($preset['label']); ?>">
+                                            <img src="" alt="" style="filter:<?php echo esc_attr($preset['css']); ?>;">
+                                            <span><?php echo esc_html($preset['label']); ?></span>
+                                        </button>
+                                    <?php endforeach; ?>
+                                </div>
+                            </details>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -518,7 +523,9 @@ class VSNN_2612_Admin {
                 modalImage.css('filter', getFilterCss(filterKey));
                 modal.find('.vsnn-filter-card img').attr('src', thumb.attr('src'));
                 modal.find('.vsnn-filter-card').removeClass('is-selected');
-                modal.find('.vsnn-filter-card[data-filter-key="' + filterKey + '"]').addClass('is-selected');
+                var selectedCard = modal.find('.vsnn-filter-card[data-filter-key="' + filterKey + '"]');
+                selectedCard.addClass('is-selected');
+                selectedCard.closest('.vsnn-filter-group').prop('open', true);
                 modal.css('display', 'flex');
             }
 

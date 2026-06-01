@@ -3,7 +3,7 @@
  * Plugin Name:       LWSlider - Lightweight BS5 Slider
  * Plugin URI:        https://codecanyon.net/user/nhutnguyen
  * Description:       A lightweight, fast, and highly customizable Bootstrap 5 slider. Supports Touch Swipe, Animate.css, Video, and unique 3D effects.
- * Version:           0.0.1f
+ * Version:           0.0.1g
  * Author:            Nhut Nguyen
  * Author URI:        mailto:nhut.nguyenminh.it@gmail.com
  * Text Domain:       lw-slider
@@ -17,7 +17,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 // 1. Define Constants (Prefix: VSNN_2612)
-define( 'VSNN_2612_VERSION', '0.0.1f' );
+define( 'VSNN_2612_VERSION', '0.0.1g' );
 define( 'VSNN_2612_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'VSNN_2612_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'VSNN_2612_TEXT_DOMAIN', 'lw-slider' );
@@ -29,6 +29,10 @@ define( 'VSNN_2612_GITHUB_API', 'https://api.github.com/repos/' . VSNN_2612_GITH
 define( 'VSNN_2612_GITHUB_CACHE_KEY', 'vsnn_2612_github_release' );
 
 // 2. Autoload Classes
+$vsnn_2612_vendor_autoload = VSNN_2612_PLUGIN_DIR . 'vendor/autoload.php';
+if ( file_exists( $vsnn_2612_vendor_autoload ) ) {
+    require_once $vsnn_2612_vendor_autoload;
+}
 require_once VSNN_2612_PLUGIN_DIR . 'class-vsnn-2612-filters.php';
 require_once VSNN_2612_PLUGIN_DIR . 'admin/class-vsnn-2612-admin.php';
 require_once VSNN_2612_PLUGIN_DIR . 'public/class-vsnn-2612-public.php';

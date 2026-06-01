@@ -1,0 +1,6 @@
+{
+    "require": {
+        "intervention/image": "^4.1",
+        "kosinix/grafika": "^2.0"
+    }
+}
