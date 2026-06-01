@@ -3,7 +3,7 @@
  * Plugin Name:       LWSlider - Lightweight BS5 Slider
  * Plugin URI:        https://codecanyon.net/user/nhutnguyen
  * Description:       A lightweight, fast, and highly customizable Bootstrap 5 slider. Supports Touch Swipe, Animate.css, Video, and unique 3D effects.
- * Version:           0.0.1d
+ * Version:           0.0.1e
  * Author:            Nhut Nguyen
  * Author URI:        mailto:nhut.nguyenminh.it@gmail.com
  * Text Domain:       lw-slider
@@ -17,7 +17,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 // 1. Define Constants (Prefix: VSNN_2612)
-define( 'VSNN_2612_VERSION', '0.9.00' );
+define( 'VSNN_2612_VERSION', '0.0.1e' );
 define( 'VSNN_2612_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'VSNN_2612_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'VSNN_2612_TEXT_DOMAIN', 'lw-slider' );
@@ -26,6 +26,7 @@ define( 'VSNN_2612_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 define( 'VSNN_2612_GITHUB_REPO', 'nhockool1002/lw-slider' );
 define( 'VSNN_2612_GITHUB_URL', 'https://github.com/' . VSNN_2612_GITHUB_REPO );
 define( 'VSNN_2612_GITHUB_API', 'https://api.github.com/repos/' . VSNN_2612_GITHUB_REPO . '/releases/latest' );
+define( 'VSNN_2612_GITHUB_CACHE_KEY', 'vsnn_2612_github_release' );
 
 // 2. Autoload Classes
 require_once VSNN_2612_PLUGIN_DIR . 'class-vsnn-2612-filters.php';
@@ -62,11 +63,32 @@ function vsnn_2612_normalize_github_version( $tag_name ) {
     return preg_replace( '/^v/i', '', trim( (string) $tag_name ) );
 }
 
-function vsnn_2612_get_github_release() {
-    $cache_key = 'vsnn_2612_github_release';
-    $cached    = get_site_transient( $cache_key );
+function vsnn_2612_normalize_version_for_compare( $version ) {
+    $version = strtolower( vsnn_2612_normalize_github_version( $version ) );
 
-    if ( false !== $cached ) {
+    if ( preg_match( '/^(\d+(?:\.\d+)*)([a-z])$/', $version, $matches ) ) {
+        return $matches[1] . '.' . ( ord( $matches[2] ) - 96 );
+    }
+
+    return $version;
+}
+
+function vsnn_2612_is_newer_version( $remote_version, $current_version ) {
+    return version_compare(
+        vsnn_2612_normalize_version_for_compare( $remote_version ),
+        vsnn_2612_normalize_version_for_compare( $current_version ),
+        '>'
+    );
+}
+
+function vsnn_2612_get_github_release( $force_refresh = false ) {
+    if ( $force_refresh ) {
+        delete_site_transient( VSNN_2612_GITHUB_CACHE_KEY );
+    }
+
+    $cached = get_site_transient( VSNN_2612_GITHUB_CACHE_KEY );
+
+    if ( false !== $cached && ! $force_refresh ) {
         return $cached;
     }
 
@@ -107,7 +129,7 @@ function vsnn_2612_get_github_release() {
         return false;
     }
 
-    set_site_transient( $cache_key, $release, 6 * HOUR_IN_SECONDS );
+    set_site_transient( VSNN_2612_GITHUB_CACHE_KEY, $release, 15 * MINUTE_IN_SECONDS );
 
     return $release;
 }
@@ -134,7 +156,8 @@ function vsnn_2612_check_github_update( $transient ) {
         return $transient;
     }
 
-    $release = vsnn_2612_get_github_release();
+    $force_refresh = ! empty( $_GET['force-check'] ) || ! empty( $_GET['vsnn_2612_check_update'] );
+    $release = vsnn_2612_get_github_release( $force_refresh );
 
     if ( ! $release || empty( $release['version'] ) ) {
         return $transient;
@@ -142,7 +165,7 @@ function vsnn_2612_check_github_update( $transient ) {
 
     $update_data = vsnn_2612_get_update_data( $release );
 
-    if ( version_compare( $release['version'], $transient->checked[ VSNN_2612_PLUGIN_BASENAME ], '>' ) ) {
+    if ( vsnn_2612_is_newer_version( $release['version'], $transient->checked[ VSNN_2612_PLUGIN_BASENAME ] ) ) {
         $transient->response[ VSNN_2612_PLUGIN_BASENAME ] = $update_data;
     } else {
         $transient->no_update[ VSNN_2612_PLUGIN_BASENAME ] = $update_data;
@@ -151,6 +174,39 @@ function vsnn_2612_check_github_update( $transient ) {
     return $transient;
 }
 add_filter( 'pre_set_site_transient_update_plugins', 'vsnn_2612_check_github_update' );
+
+function vsnn_2612_clear_update_cache() {
+    if ( empty( $_GET['vsnn_2612_check_update'] ) || empty( $_GET['_wpnonce'] ) ) {
+        return;
+    }
+
+    if ( ! current_user_can( 'update_plugins' ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'vsnn_2612_check_update' ) ) {
+        return;
+    }
+
+    delete_site_transient( VSNN_2612_GITHUB_CACHE_KEY );
+    delete_site_transient( 'update_plugins' );
+
+    wp_safe_redirect( remove_query_arg( array( 'vsnn_2612_check_update', '_wpnonce' ) ) );
+    exit;
+}
+add_action( 'admin_init', 'vsnn_2612_clear_update_cache' );
+
+function vsnn_2612_add_update_check_link( $links ) {
+    if ( ! current_user_can( 'update_plugins' ) ) {
+        return $links;
+    }
+
+    $url = wp_nonce_url(
+        add_query_arg( 'vsnn_2612_check_update', '1', admin_url( 'plugins.php' ) ),
+        'vsnn_2612_check_update'
+    );
+
+    $links[] = '<a href="' . esc_url( $url ) . '">' . esc_html__( 'Check for updates', 'lw-slider' ) . '</a>';
+
+    return $links;
+}
+add_filter( 'plugin_action_links_' . VSNN_2612_PLUGIN_BASENAME, 'vsnn_2612_add_update_check_link' );
 
 function vsnn_2612_github_plugin_info( $result, $action, $args ) {
     if ( 'plugin_information' !== $action || empty( $args->slug ) || VSNN_2612_SLUG !== $args->slug ) {
