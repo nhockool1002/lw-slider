@@ -3,7 +3,7 @@
  * Plugin Name:       LWSlider - Lightweight BS5 Slider
  * Plugin URI:        https://codecanyon.net/user/nhutnguyen
  * Description:       A lightweight, fast, and highly customizable Bootstrap 5 slider. Supports Touch Swipe, Animate.css, Video, and unique 3D effects.
- * Version:           0.0.1g
+ * Version:           0.0.1h
  * Author:            Nhut Nguyen
  * Author URI:        mailto:nhut.nguyenminh.it@gmail.com
  * Text Domain:       lw-slider
@@ -17,7 +17,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 // 1. Define Constants (Prefix: VSNN_2612)
-define( 'VSNN_2612_VERSION', '0.0.1g' );
+define( 'VSNN_2612_VERSION', '0.0.1h' );
 define( 'VSNN_2612_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'VSNN_2612_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'VSNN_2612_TEXT_DOMAIN', 'lw-slider' );

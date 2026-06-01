@@ -95,14 +95,14 @@ class VSNN_2612_Public {
             .vsnn-public-wrapper.layout-bottom { display: block; }
             .vsnn-public-wrapper.layout-bottom .vsnn-public-thumbs { 
                 position: absolute; bottom: 0; left: 0; width: 100%; 
-                justify-content: center; padding-bottom: 10px;
+                justify-content: flex-start; padding-bottom: 10px;
             }
 
             /* Left */
             .vsnn-public-wrapper.layout-left { flex-direction: row; align-items: center; }
             .vsnn-public-wrapper.layout-left .vsnn-public-thumbs { 
                 flex-direction: column; width: 80px; max-height: 100%; 
-                overflow-y: auto; order: 1; border-right: 1px solid rgba(255,255,255,0.1); 
+                overflow-x: hidden; overflow-y: auto; order: 1; border-right: 1px solid rgba(255,255,255,0.1);
             }
             .vsnn-public-wrapper.layout-left .vsnn-public-main { order: 2; }
 
@@ -110,7 +110,7 @@ class VSNN_2612_Public {
             .vsnn-public-wrapper.layout-right { flex-direction: row; align-items: center; }
             .vsnn-public-wrapper.layout-right .vsnn-public-thumbs { 
                 flex-direction: column; width: 80px; max-height: 100%; 
-                overflow-y: auto; order: 2; border-left: 1px solid rgba(255,255,255,0.1); 
+                overflow-x: hidden; overflow-y: auto; order: 2; border-left: 1px solid rgba(255,255,255,0.1);
             }
             .vsnn-public-wrapper.layout-right .vsnn-public-main { order: 1; }
 
@@ -131,6 +131,8 @@ class VSNN_2612_Public {
             .vsnn-public-thumbs { 
                 z-index: 30; display: flex; gap: 5px; padding: 10px; 
                 background: rgba(0,0,0,0.6); backdrop-filter: blur(2px);
+                overflow-x: auto; overflow-y: hidden; flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch; scrollbar-width: thin; box-sizing: border-box;
             }
             .vsnn-public-thumbs img { 
                 width: 60px; height: 40px; object-fit: cover; 

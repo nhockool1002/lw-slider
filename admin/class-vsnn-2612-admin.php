@@ -125,8 +125,8 @@ class VSNN_2612_Admin {
             .vsnn-prev-overlay { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
             .vsnn-preview-caption { position: absolute; bottom: 90px; left: 10%; right: 10%; background: rgba(0,0,0,0.5); color: #fff; padding: 10px; text-align: center; border-radius: 4px; z-index: 20; }
             
-            .vsnn-prev-thumbs { z-index: 30; display: flex; gap: 5px; padding: 10px; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); }
-            .vsnn-prev-thumbs img { width: 60px; height: 40px; object-fit: cover; border: 2px solid transparent; opacity: 0.6; cursor: pointer; border-radius: 2px; transition: .2s; background: #000; }
+            .vsnn-prev-thumbs { z-index: 30; display: flex; gap: 5px; padding: 10px; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); overflow-x: auto; overflow-y: hidden; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: thin; box-sizing: border-box; }
+            .vsnn-prev-thumbs img { width: 60px; height: 40px; object-fit: cover; border: 2px solid transparent; opacity: 0.6; cursor: pointer; border-radius: 2px; transition: .2s; background: #000; flex: 0 0 auto; }
             .vsnn-prev-thumbs img.active, .vsnn-prev-thumbs img:hover { opacity: 1; border-color: #fff; transform: scale(1.05); }
 
             .vsnn-prev, .vsnn-next { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; border: none; cursor: pointer; background: transparent; color: #fff; font-size: 24px; display:flex; align-items:center; justify-content:center; z-index: 40; }
@@ -137,16 +137,16 @@ class VSNN_2612_Admin {
             
             /* Layouts */
             .vsnn-preview-wrapper.layout-bottom { display: block; }
-            .vsnn-preview-wrapper.layout-bottom .vsnn-prev-thumbs { position: absolute; bottom: 0; left: 0; width: 100%; justify-content: center; pointer-events: none; }
-            .vsnn-preview-wrapper.layout-bottom .vsnn-prev-thumbs img { pointer-events: auto; border-color: rgba(255,255,255,0.5); }
+            .vsnn-preview-wrapper.layout-bottom .vsnn-prev-thumbs { position: absolute; bottom: 0; left: 0; width: 100%; justify-content: flex-start; pointer-events: auto; }
+            .vsnn-preview-wrapper.layout-bottom .vsnn-prev-thumbs img { border-color: rgba(255,255,255,0.5); }
             .vsnn-preview-wrapper.layout-bottom .vsnn-prev-thumbs img.active { border-color: #fff; }
 
             .vsnn-preview-wrapper.layout-left { flex-direction: row; align-items: center; }
-            .vsnn-preview-wrapper.layout-left .vsnn-prev-thumbs { flex-direction: column; width: 80px; max-height: 400px; overflow-y: auto; order: 1; }
+            .vsnn-preview-wrapper.layout-left .vsnn-prev-thumbs { flex-direction: column; width: 80px; max-height: 400px; overflow-x: hidden; overflow-y: auto; order: 1; }
             .vsnn-preview-wrapper.layout-left .vsnn-prev-main { order: 2; }
 
             .vsnn-preview-wrapper.layout-right { flex-direction: row; align-items: center; }
-            .vsnn-preview-wrapper.layout-right .vsnn-prev-thumbs { flex-direction: column; width: 80px; max-height: 400px; overflow-y: auto; order: 2; }
+            .vsnn-preview-wrapper.layout-right .vsnn-prev-thumbs { flex-direction: column; width: 80px; max-height: 400px; overflow-x: hidden; overflow-y: auto; order: 2; }
             .vsnn-preview-wrapper.layout-right .vsnn-prev-main { order: 1; }
             
             /* --- DOCS MODAL STYLES --- */
